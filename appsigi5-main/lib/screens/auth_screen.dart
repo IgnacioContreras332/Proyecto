@@ -1,4 +1,5 @@
 import 'package:appsigi5/screens/home_screen.dart';
+import 'package:appsigi5/screens/forgot_password_screen.dart'; // ✅ Importar pantalla de recuperación
 import 'package:flutter/material.dart';
 import 'package:appsigi5/services/auth_service.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
@@ -113,15 +114,33 @@ class _AuthScreenState extends State<AuthScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.red, fontFamily: 'Montserrat'),
                 ),
+              
+              // ✅ Nuevo botón "Olvidé mi contraseña"
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                ),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Text(
+                  '¿Olvidaste tu contraseña?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: 'Montserrat', color: Colors.deepPurpleAccent),
+                ),
+              ),
+
+              // ✅ Botón de registro
               TextButton(
                 onPressed: () => Navigator.pushNamed(context, '/register'),
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                 ),
-                child: Text(
+                child: const Text(
                   '¿No tienes cuenta? Regístrate',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontFamily: 'Montserrat', color: Colors.deepPurpleAccent) ,
+                  style: TextStyle(fontFamily: 'Montserrat', color: Colors.deepPurpleAccent),
                 ),
               ),
             ],

@@ -1,0 +1,17 @@
+Si quieren usar emulador cambia las IP puestas en:
+
+ app.py
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+Y en
+
+auth_services.dart
+
+static const String baseUrl = 'http://127.0.0.1:5000';
+
+
+
+Si vas a usar un celular fisico solo cambia ambas opciones por la Ip de tu pc.

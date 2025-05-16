@@ -1,4 +1,6 @@
+import 'package:appsigi5/screens/esp32_connection_screen';
 import 'package:appsigi5/screens/feeder_detail_screen.dart';
+ // Importa la nueva pantalla
 import 'package:flutter/material.dart';
 
 class FeedersScreen extends StatefulWidget {
@@ -26,32 +28,31 @@ class _FeedersScreenState extends State<FeedersScreen> {
   Future<void> _removeFeeder(int index) async {
     return showDialog<void>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Eliminar comedero'),
-            content: Text(
-              '¿Estás seguro de eliminar ${feedersSnapshot.data![index]}?',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancelar'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  await Future.delayed(const Duration(milliseconds: 500));
-                  setState(() {
-                    feedersSnapshot.data!.removeAt(index);
-                  });
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Eliminar',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar comedero'),
+        content: Text(
+          '¿Estás seguro de eliminar ${feedersSnapshot.data![index]}?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
           ),
+          TextButton(
+            onPressed: () async {
+              await Future.delayed(const Duration(milliseconds: 500));
+              setState(() {
+                feedersSnapshot.data!.removeAt(index);
+              });
+              Navigator.pop(context);
+            },
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -59,11 +60,19 @@ class _FeedersScreenState extends State<FeedersScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => FeederDetailScreen(
-              feederName: feederName,
-              onThemeChanged: widget.onThemeChanged,
-            ),
+        builder: (context) => FeederDetailScreen(
+          feederName: feederName,
+          onThemeChanged: widget.onThemeChanged,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToESP32Connection() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ESP32ConnectionScreen(),
       ),
     );
   }
@@ -84,7 +93,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.pets, size: 30, color: Colors.deepPurpleAccent),
+                  const Icon(Icons.pets, size: 30, color: Colors.deepPurpleAccent),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => _removeFeeder(index),
@@ -102,7 +111,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     'Estado: Activo',
                     style: TextStyle(color: Colors.deepPurpleAccent),
                   ),
@@ -155,7 +164,6 @@ class _FeedersScreenState extends State<FeedersScreen> {
           'Mis Comederos',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-
         centerTitle: true,
         elevation: 0,
         backgroundColor: const Color.fromARGB(0, 0, 0, 0),
@@ -194,11 +202,11 @@ class _FeedersScreenState extends State<FeedersScreen> {
                     return GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.9,
-                          ),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.9,
+                      ),
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         return _buildFeederCard(snapshot.data![index], index);
@@ -208,8 +216,6 @@ class _FeedersScreenState extends State<FeedersScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
-
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -227,6 +233,25 @@ class _FeedersScreenState extends State<FeedersScreen> {
                   ),
                 ),
                 onPressed: _addFeeder,
+              ),
+            ),
+            const SizedBox(height: 16), // Espacio entre los botones
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.wifi, color: Colors.white),
+                label: const Text(
+                  'Conexión ESP32',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey, // Puedes personalizar el color
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: _navigateToESP32Connection,
               ),
             ),
           ],

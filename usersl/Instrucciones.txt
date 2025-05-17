@@ -1,17 +1,27 @@
 Si quieren usar emulador cambia las IP puestas en:
 
  app.py
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-Y en
-
-auth_services.dart
-
-static const String baseUrl = 'http://127.0.0.1:5000';
+    if __name__ == '__main__':
+        app.run(debug=True, host='0.0.0.0', port=5000)
 
 
+, en
+ auth_services.dart
+    static const String baseUrl = 'http://127.0.0.1:5000';
+
+, en
+ /Proyecto/Conexion_cliente_servidor/Servidor2.py
+ class ServidorSocket:
+    DIRECCION = "192.168.137.70"
+
+, en
+ /Proyecto/Conexion_cliente_servidor/Final_code_Wifi/Final_code_Wifi.ino   
+    // Datos de la conexión a internet
+    const char* ssid = "ZAC-BC_PC";
+    const char* password = "123456789";
+
+    // Datos de la conexión al servidor
+    const char* server_ip = "192.168.137.70";
+    const int server_port = 65440;
 
 Si vas a usar un celular fisico solo cambia ambas opciones por la Ip de tu pc.

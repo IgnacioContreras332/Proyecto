@@ -71,7 +71,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ESP32ConnectionScreen(),
+        builder: (context) => ESP32ConnectionScreen(onThemeChanged: widget.onThemeChanged,),
       ),
     );
   }

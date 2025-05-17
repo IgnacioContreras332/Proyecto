@@ -71,7 +71,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ESP32ConnectionScreen(onThemeChanged: widget.onThemeChanged,),
+        builder: (context) => ESP32ConnectionScreen(onThemeChanged: widget.onThemeChanged),
       ),
     );
   }
@@ -234,7 +234,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
                 onPressed: _addFeeder,
               ),
             ),
-            const SizedBox(height: 16), // Espacio entre los botones
+            const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -244,7 +244,7 @@ class _FeedersScreenState extends State<FeedersScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey, // Puedes personalizar el color
+                  backgroundColor: Colors.blueGrey,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

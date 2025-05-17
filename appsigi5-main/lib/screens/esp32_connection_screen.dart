@@ -2,18 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:appsigi5/screens/feeders_screen.dart';
-
-class ComederosData {
-  static String nivelComedero1 = "";
-  static String nivelComedero2 = "";
-  static String nivelComedero3 = "";
-
-  static void actualizarDatos(Map<String, dynamic> responseData) {
-    nivelComedero1 = responseData['nivel_comedero1'] ?? "Desconocido";
-    nivelComedero2 = responseData['nivel_comedero2'] ?? "Desconocido";
-    nivelComedero3 = responseData['nivel_comedero3'] ?? "Desconocido";
-  }
-}
+import 'package:appsigi5/data/comederos_data.dart';
 
 class ESP32ConnectionScreen extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
@@ -28,7 +17,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
   Socket? socket;
-  bool _dialogShown = false; // ✅ Variable para controlar el diálogo
+  bool _dialogShown = false; // ✅ Solo muestra el mensaje una vez
 
   void _connectToESP32() async {
     String ipAddress = _ipController.text;
@@ -38,10 +27,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
       try {
         socket = await Socket.connect(ipAddress, port);
         print('Conectado a $ipAddress:$port');
-
         _listenToServer(socket!);
-        print("comedero1 = ${ComederosData.nivelComedero1}, comedero2 = ${ComederosData.nivelComedero2}, comedero3 = ${ComederosData.nivelComedero3}");
-
       } catch (e) {
         print('Error al conectar: $e');
       }
@@ -57,10 +43,14 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
 
       try {
         Map<String, dynamic> responseData = jsonDecode(jsonResponse);
-        ComederosData.actualizarDatos(responseData);
-        print("Comederos actualizados: ${ComederosData.nivelComedero1}, ${ComederosData.nivelComedero2}, ${ComederosData.nivelComedero3}");
+        
+        // ✅ Actualiza los datos y la UI
+        setState(() {
+          ComederosData.actualizarDatos(responseData);
+        });
 
-        // ✅ Solo mostrar el diálogo si aún no se ha mostrado
+        print("Datos actualizados: ${ComederosData.nivelComedero1}, ${ComederosData.nivelComedero2}, ${ComederosData.nivelComedero3}");
+
         if (!_dialogShown) {
           _dialogShown = true;
           _showConnectionSuccessDialog();
@@ -78,7 +68,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Conexión exitosa'),
-          content: Text('Servidor respondió correctamente. Datos guardados.'),
+          content: const Text('Servidor respondió correctamente. Datos guardados.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -101,10 +91,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Conexión ESP32'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Conexión ESP32'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -112,11 +99,9 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
           children: <Widget>[
             TextField(
               controller: _ipController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Dirección IP',
-                hintText: 'Ej: 192.168.137.70',
-                border: OutlineInputBorder(),
+                labelText: 'Dirección IP', hintText: 'Ej: 192.168.137.70', border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
@@ -124,14 +109,12 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
               controller: _portController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Puerto',
-                hintText: 'Ej: 65440',
-                border: OutlineInputBorder(),
+                labelText: 'Puerto', hintText: 'Ej: 65440', border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _connectToESP32,
+              onPressed: _connectToESP32, 
               child: const Text('Iniciar Conexión'),
             ),
           ],

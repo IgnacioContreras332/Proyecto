@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService {
-  static const String baseUrl = 'http://192.168.137.70:5000';
+  static const String baseUrl = 'http://192.168.0.182:5000';
 
   // 📩 Enviar código de verificación al correo
   static Future<bool> enviarCodigo(String email) async {

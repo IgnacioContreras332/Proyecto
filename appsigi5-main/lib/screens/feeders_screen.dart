@@ -1,67 +1,49 @@
 import 'package:appsigi5/screens/feeder_detail_screen.dart';
-import 'package:appsigi5/screens/esp32_connection_screen.dart'; // Importa la nueva pantalla
+import 'package:appsigi5/screens/esp32_connection_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:appsigi5/data/comederos_data.dart';
+import 'dart:io'; // ✅ Importar dart:io para Socket
 
 class FeedersScreen extends StatefulWidget {
   final Function(ThemeMode) onThemeChanged;
+  final Socket? socket; // ✅ Recibir la instancia del Socket
 
-  const FeedersScreen({super.key, required this.onThemeChanged});
+  const FeedersScreen({super.key, required this.onThemeChanged, this.socket}); // ✅ Actualizar el constructor
 
   @override
   State<FeedersScreen> createState() => _FeedersScreenState();
 }
 
 class _FeedersScreenState extends State<FeedersScreen> {
+  late Future<List<String>> feedersFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    feedersFuture = _loadFeeders();
+    print('Socket recibido en Feeders: ${widget.socket}'); // 🔍 Para depuración
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {}); // ✅ Forzar actualización cada vez que la pantalla cambia
+  }
+
   Future<List<String>> _loadFeeders() async {
     await Future.delayed(const Duration(seconds: 1));
     return ['Comedero 1', 'Comedero 2', 'Comedero 3'];
   }
 
-  Future<void> _addFeeder() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    setState(() {
-      feedersSnapshot.data!.add('Comedero ${feedersSnapshot.data!.length + 1}');
-    });
-  }
-
-  Future<void> _removeFeeder(int index) async {
-    return showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar comedero'),
-        content: Text(
-          '¿Estás seguro de eliminar ${feedersSnapshot.data![index]}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await Future.delayed(const Duration(milliseconds: 500));
-              setState(() {
-                feedersSnapshot.data!.removeAt(index);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _navigateToDetail(String feederName) {
+  void _navigateToDetail(int feederId) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => FeederDetailScreen(
-          feederName: feederName,
+          feederId: feederId,
           onThemeChanged: widget.onThemeChanged,
+          // socket
+          // socket: widget.socket, // ✅ Pasar el socket si es necesario en DetailScreen
         ),
       ),
     );
@@ -76,82 +58,68 @@ class _FeedersScreenState extends State<FeedersScreen> {
     );
   }
 
+  void _eliminarComedero(String feederName) {
+    // Por ahora, esta función estará vacía como solicitaste.
+    print('Eliminar $feederName');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Eliminar $feederName (funcionalidad no implementada)')),
+    );
+    // En el futuro, aquí iría la lógica para eliminar el comedero.
+  }
+
+  void _togglePower(int feederId) {
+    if (widget.socket != null) { // ✅ Verificar si el socket está conectado
+      print('Gestionando energía del Comedero $feederId');
+      print('Enviando "$feederId" al socket: ${widget.socket}'); // 🔍 Para depuración
+      widget.socket!.write('$feederId'); // ✅ Enviar el ID del comedero como string
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Acción de encendido para Comedero $feederId')),
+      );
+    } else {
+      print("Socket es null. No se puede enviar el comando."); // 🔍 Para depuración
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se puede enviar el comando. ESP32 no conectado.')),
+      );
+    }
+  }
+
   Widget _buildFeederCard(String feederName, int index) {
+    // ✅ Obtener el nivel correcto basado en el índice
+    String nivelComedero = switch (index + 1) {
+      1 => ComederosData.nivelComedero1,
+      2 => ComederosData.nivelComedero2,
+      3 => ComederosData.nivelComedero3,
+      _ => "Desconocido",
+    };
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(15),
-        onTap: () => _navigateToDetail(feederName),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.pets, size: 30, color: Colors.deepPurpleAccent),
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _removeFeeder(index),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    feederName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Estado: Activo',
-                    style: TextStyle(color: Colors.deepPurpleAccent),
-                  ),
-                ],
-              ),
-            ],
-          ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(feederName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text('Nivel: $nivelComedero', style: const TextStyle(color: Colors.deepPurpleAccent)),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  onPressed: () => _eliminarComedero(feederName),
+                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                ),
+                IconButton(
+                  onPressed: () => _togglePower(index + 1), // ✅ Pasar el ID del comedero
+                  icon: const Icon(Icons.power_settings_new, color: Colors.green),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.pets, size: 60, color: Colors.deepPurpleAccent[400]),
-          const SizedBox(height: 16),
-          const Text(
-            'No tienes comederos',
-            style: TextStyle(fontSize: 18, color: Colors.deepPurpleAccent),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Presiona el botón para agregar uno',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.deepPurpleAccent),
-          ),
-        ],
-      ),
-    );
-  }
-
-  late Future<List<String>> feedersFuture;
-  late AsyncSnapshot<List<String>> feedersSnapshot;
-
-  @override
-  void initState() {
-    super.initState();
-    feedersFuture = _loadFeeders();
   }
 
   @override
@@ -159,14 +127,8 @@ class _FeedersScreenState extends State<FeedersScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Mis Comederos',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Mis Comederos'),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-        foregroundColor: Colors.deepPurpleAccent,
         actions: [
           IconButton(
             icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
@@ -178,83 +140,64 @@ class _FeedersScreenState extends State<FeedersScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: FutureBuilder<List<String>>(
-                future: feedersFuture,
-                builder: (context, snapshot) {
-                  feedersSnapshot = snapshot;
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(
-                      child: Text(
-                        'Error al cargar los comederos: ${snapshot.error}',
-                      ),
-                    );
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return _buildEmptyState();
-                  } else {
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.9,
-                      ),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return _buildFeederCard(snapshot.data![index], index);
-                      },
-                    );
-                  }
-                },
-              ),
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<String>>(
+              future: feedersFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error al cargar los comederos: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text('No tienes comederos', style: TextStyle(fontSize: 18, color: Colors.deepPurpleAccent)),
+                  );
+                } else {
+                  return GridView.builder(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.95, // Ajusté un poco la relación de aspecto
+                    ),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return _buildFeederCard(snapshot.data![index], index);
+                    },
+                  );
+                }
+              },
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.add, color: Colors.white),
-                label: const Text(
-                  'Agregar Comedero',
-                  style: TextStyle(color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: _addFeeder,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text('Agregar Comedero', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 15),
               ),
+              onPressed: () {}, // Puedes implementar la lógica aquí
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.wifi, color: Colors.white),
-                label: const Text(
-                  'Conexión ESP32',
-                  style: TextStyle(color: Colors.white),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueGrey,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: _navigateToESP32Connection,
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(Icons.wifi, color: Colors.white),
+              label: const Text('Configurar ESP32', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueGrey,
+                padding: const EdgeInsets.symmetric(vertical: 15),
               ),
+              onPressed: _navigateToESP32Connection,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

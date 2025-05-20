@@ -22,18 +22,11 @@ En /Proyecto/usersl ejecutar el comando "venv/Scrips/activate" para activar el e
 una vez activado ejecutar el comando "pip install flask flask-cors mysql-connector-python"
 
 
+Si se quiere visualizar en un emulador se debe cambiar la ip del codigo en 
+auth_services.dart y en api_routes.dart
+por: 10.0.2.2:8000,
+Si no se cambiara a la ip de una computadora o servidor.
 
-
-Si quieren usar emulador cambia las IP puestas en:
-
- app.py
-    if __name__ == '__main__':
-        app.run(debug=True, host='0.0.0.0', port=5000)
-
-
-, en
- auth_services.dart
-    static const String baseUrl = 'http://127.0.0.1:5000';
 
 , en
  /Proyecto/Conexion_cliente_servidor/Servidor2.py

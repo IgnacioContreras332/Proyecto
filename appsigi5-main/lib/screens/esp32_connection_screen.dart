@@ -36,6 +36,10 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
     }
   }
 
+  void writeToServer(String mensaje) {
+    socket!.write(mensaje);
+  }
+
   void _listenToServer(Socket socket) {
     socket.listen((List<int> data) {
       String jsonResponse = utf8.decode(data);
@@ -43,7 +47,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
 
       try {
         Map<String, dynamic> responseData = jsonDecode(jsonResponse);
-        
+
         // ✅ Actualiza los datos y la UI
         setState(() {
           ComederosData.actualizarDatos(responseData);
@@ -55,7 +59,6 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
           _dialogShown = true;
           _showConnectionSuccessDialog();
         }
-
       } catch (e) {
         print("Error al procesar JSON: $e");
       }
@@ -76,7 +79,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => FeedersScreen(onThemeChanged: widget.onThemeChanged),
+                    builder: (context) => FeedersScreen(onThemeChanged: widget.onThemeChanged, socket: socket), // ✅ Pasar el socket
                   ),
                 );
               },
@@ -114,7 +117,7 @@ class _ESP32ConnectionScreenState extends State<ESP32ConnectionScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _connectToESP32, 
+              onPressed: _connectToESP32,
               child: const Text('Iniciar Conexión'),
             ),
           ],

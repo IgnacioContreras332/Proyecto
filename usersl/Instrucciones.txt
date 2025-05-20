@@ -1,0 +1,53 @@
+Para correr el programa nececitamos tener instalado flutter, python 3.12, mysql 8.0.47
+
+
+configurar la BD conforme a tus nececidades, la contraseña en este caso es: "coai8833" y usar la siguiente Query
+"CREATE DATABASE comedero_db;
+USE comedero_db;
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE,
+    name VARCHAR(255),
+    password VARCHAR(255)
+);
+Select * from users;"
+
+
+Ejecutar el comando "flutter pub get" desde la direccion /Proyecto/appsigi5-main
+
+Ejecutar el comando "python -m venv venv" desde la direccion /Proyecto/usersl
+
+En /Proyecto/usersl ejecutar el comando "venv/Scrips/activate" para activar el entorno virtual
+
+una vez activado ejecutar el comando "pip install flask flask-cors mysql-connector-python"
+
+
+
+
+Si quieren usar emulador cambia las IP puestas en:
+
+ app.py
+    if __name__ == '__main__':
+        app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+, en
+ auth_services.dart
+    static const String baseUrl = 'http://127.0.0.1:5000';
+
+, en
+ /Proyecto/Conexion_cliente_servidor/Servidor2.py
+ class ServidorSocket:
+    DIRECCION = "192.168.137.70"
+
+, en
+ /Proyecto/Conexion_cliente_servidor/Final_code_Wifi/Final_code_Wifi.ino   
+    // Datos de la conexión a internet
+    const char* ssid = "ZAC-BC_PC";
+    const char* password = "123456789";
+
+    // Datos de la conexión al servidor
+    const char* server_ip = "192.168.137.70";
+    const int server_port = 65440;
+
+Si vas a usar un celular fisico solo cambia ambas opciones por la Ip de tu pc.

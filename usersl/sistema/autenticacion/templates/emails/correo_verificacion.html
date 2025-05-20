@@ -1,0 +1,35 @@
+<!-- autenticacion/templates/autenticacion/correo_verificacion.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Código de Verificación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e; /* negro azulado */
+            color: #f2c14e; /* amarillo */
+            padding: 20px;
+        }
+        h1 {
+            color: #6a0572; /* morado */
+        }
+        .codigo {
+            font-size: 2em;
+            font-weight: bold;
+            color: #f2c14e; /* amarillo */
+            background-color: #6a0572; /* morado */
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔒 Tu Código de Verificación</h1>
+    <p>Usa este código para completar tu registro:</p>
+    <div class="codigo">{{ codigo }}</div>
+    <p>Si no solicitaste este código, ignora este correo.</p>
+</body>
+</html>

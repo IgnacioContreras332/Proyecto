@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(n0t=-^pf4wq3erdtptc)=+k$bos(&1+kce(ptfr&yig$3()2a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.71']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.71','98.12.25.183', '192.168.203.57','ALLOWED_HOSTS = ["sistema.up.railway.app"]']
 
 
 # Application definition
@@ -91,9 +91,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'comedero_db',
         'USER': 'root',
-        'PASSWORD': 'coai8833',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'PASSWORD': 'ngukWeIdNcCaXyyAoscChnaLTJkXctlI',
+        'HOST': 'ballast.proxy.rlwy.net',
+        'PORT': '27080',
     }
 }
 

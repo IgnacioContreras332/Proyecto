@@ -27,6 +27,8 @@ auth_services.dart y en api_routes.dart
 por: 10.0.2.2:8000,
 Si no se cambiara a la ip de una computadora o servidor.
 
+//Prender servidor
+python manage.py runserver 0.0.0.0:8000
 
 , en
  /Proyecto/Conexion_cliente_servidor/Servidor2.py
